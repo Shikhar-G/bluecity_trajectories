@@ -196,5 +196,5 @@ with open('array.pickle', 'rb') as f:
     data = pickle.load(f)
 
 process_pickle()
-make_images()
-make_gif()
+# make_images()
+# make_gif()

@@ -2,3 +2,5 @@ test/
 test1/
 images/
 __pycache__/
+*.pickle
+*.log*
