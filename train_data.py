@@ -8,6 +8,7 @@ import cv2
 import numpy as np
 import os
 import pickle
+import time
 
 roslib.load_manifest('amrl_msgs')
 import rospkg
@@ -20,9 +21,13 @@ stream = None
 arr = []
 
 def save_data():
-  # Save the trajectories as a pickle file
+  # Save the trajectories as a pickle file appending the current date and time
   print(trajectories)
-  with open("trajectory.pickle", "wb") as f:
+  # Make sure trajectories is not empty
+  if len(trajectories) == 0:
+    print("No trajectory data to save")
+    return
+  with open(f"trajectory_{time.strftime('%Y%m%d-%H%M%S')}.pkl", "wb") as f:
     pickle.dump(trajectories, f)
   print("Trajectory data saved")
 
@@ -30,8 +35,8 @@ if __name__ == '__main__':
   rospy.init_node('bluecity_trajectories', anonymous=False)
   rospy.on_shutdown(save_data)
 
-  # Trajectory dictionary mapping object id to a list of tuples
-  # of the form (class, x, y, speed, angle)
+  # Trajectory dictionary mapping object id to a nested dictionary
+  # of the form {frame: frame_number, class: class_type, x: x_coordinate, y: y_coordinate, speed: speed, angle: angle}
   trajectories = {}
 
   # Loop while rospy is not shutdown. 
@@ -60,15 +65,19 @@ if __name__ == '__main__':
             # BCTWSConnection.subscriptionOption.PHASE_CHANGE,
             BCTWSConnection.subscriptionOption.FRAME])
     print("Stream opened")
-
+    frame_counter = 0
     while rospy.is_shutdown() == False:
+      # get one frame of data
       data = stream.get_frame()
+
       # append to trajectory dictionary
       for obj in data.objects:
         if obj.id not in trajectories:
           trajectories[obj.id] = []
           # speed is an optional field
         if obj.speed is not None:
-          trajectories[obj.id].append((obj.classType, obj.centerX, obj.centerY, obj.speed, obj.rotation))
+          trajectories[obj.id].append({'frame': frame_counter, 'class': obj.classType, 'x': obj.centerX, 'y': obj.centerY, 'speed': obj.speed})
         else:
-          trajectories[obj.id].append((obj.classType, obj.centerX, obj.centerY, 0, obj.rotation))
+          trajectories[obj.id].append({'frame': frame_counter, 'class': obj.classType, 'x': obj.centerX, 'y': obj.centerY, 'speed': 0})
+      # increment frame counter
+      frame_counter += 1

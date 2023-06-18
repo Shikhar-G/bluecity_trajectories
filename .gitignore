@@ -2,5 +2,6 @@ test/
 test1/
 images/
 __pycache__/
-*.pickle
-*.log*
+*realtime_subscriber.log*
+*.png
+*.pkl
