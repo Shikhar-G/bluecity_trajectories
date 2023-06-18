@@ -11,14 +11,14 @@ def visualize_trajectories(pickle_file):
     with open(pickle_file, 'rb') as f:
         trajectories = pickle.load(f)
         # trajectories is a dictionary mapping object id to a dictionary
-        # of the form {'frame': frame_number, 'class': class_type, 'x': x_coordinate, 'y': y_coordinate, 'speed': speed}
+        # of the form{'class': class_type, 'frames': {frame_number: {'x': x_coordinate, 'y': y_coordinate, 'speed': speed}}}
         # create a plot
         fig = plt.figure()
         # update the data for each line
         for obj_id in trajectories:
-            x = [sub_dict['x'] for sub_dict in trajectories[obj_id]]
-            y = [sub_dict['y'] for sub_dict in trajectories[obj_id]]
-            objectType = int(trajectories[obj_id][0]['class'])
+            x = [frame['x'] for frame in trajectories[obj_id]['frames'].values()]
+            y = [frame['y'] for frame in trajectories[obj_id]['frames'].values()]
+            objectType = int(trajectories[obj_id]['class'])
             if objectType < 10:  
                 line, = plt.plot(x, y, label=obj_id, linestyle='solid')
             elif objectType == 10:  # pedestrian is 10, plot with dotted line

@@ -1,4 +1,3 @@
-#!/home/shikhar/venv/bin/python 
 from realtime_subscriber.Realtime_subscriber_api import BCTWSConnection
 import threading
 import sys
@@ -36,7 +35,7 @@ if __name__ == '__main__':
   rospy.on_shutdown(save_data)
 
   # Trajectory dictionary mapping object id to a nested dictionary
-  # of the form {frame: frame_number, class: class_type, x: x_coordinate, y: y_coordinate, speed: speed, angle: angle}
+  # of the form {'class': class_type, 'frames': {frame_number: {'x': x_coordinate, 'y': y_coordinate, 'speed': speed}}}
   trajectories = {}
 
   # Loop while rospy is not shutdown. 
@@ -73,11 +72,11 @@ if __name__ == '__main__':
       # append to trajectory dictionary
       for obj in data.objects:
         if obj.id not in trajectories:
-          trajectories[obj.id] = []
+          trajectories[obj.id] = {'class': obj.classType, 'frames': {}}
           # speed is an optional field
         if obj.speed is not None:
-          trajectories[obj.id].append({'frame': frame_counter, 'class': obj.classType, 'x': obj.centerX, 'y': obj.centerY, 'speed': obj.speed})
+          trajectories[obj.id]['frames'][frame_counter] = {'x': obj.centerX, 'y': obj.centerY, 'speed': obj.speed}
         else:
-          trajectories[obj.id].append({'frame': frame_counter, 'class': obj.classType, 'x': obj.centerX, 'y': obj.centerY, 'speed': 0})
+          trajectories[obj.id]['frames'][frame_counter] = {'x': obj.centerX, 'y': obj.centerY, 'speed': 0}
       # increment frame counter
       frame_counter += 1
