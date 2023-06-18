@@ -26,7 +26,9 @@ def visualize_trajectories(pickle_file):
             else:  # bicycle is 13, plot with dashed line
                 line, plt.plot(x, y, label=obj_id, linestyle='dashed')
         legend = plt.legend(fontsize='x-large', title='Object ID', ncol=len(trajectories) // 10 + 1)
-        def export_legend(legend, filename=f"legend_{time.strftime('%Y%m%d-%H%M%S')}.png"):
+        # get name of pickle file without the path or extension
+        pickle_file_name = pickle_file.split("/")[-1].split(".")[0]
+        def export_legend(legend, filename=f"{pickle_file_name}_legend.png"):
             fig  = legend.figure
             fig.canvas.draw()
             bbox  = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
@@ -36,6 +38,8 @@ def visualize_trajectories(pickle_file):
         legend.remove()
         # show the plot
         plt.show()
+        # save the plot
+        fig.savefig(f"{pickle_file_name}_graph.png")
 
 if __name__ == '__main__':
         # get input arguments
