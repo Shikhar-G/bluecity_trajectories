@@ -5,3 +5,4 @@ __pycache__/
 *realtime_subscriber.log*
 *.png
 *.pkl
+*.npy
